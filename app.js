@@ -56,7 +56,7 @@ app.get("/update-project/:id", updateProject);
 async function home(req, res) {
     const user = req.session.user;
 
-    const query = `SELECT tb_projects.*, tb_users.name AS author FROM tb_projects LEFT JOIN tb_users ON tb_projects.author_id = tb_users.id`;
+    const query = `SELECT projects.*, users.name AS author FROM projects LEFT JOIN users ON projects.author_id = users.id`;
     let projects = await sequelize.query(query, { type: QueryTypes.SELECT });
 
     res.render("index", { projects, user,  messages: res.locals.messages });
@@ -97,7 +97,7 @@ async function registerPost(req, res) {
 
     const hashedPassword = await bcrypt.hash(password, salt)
 
-    const query = `INSERT INTO tb_users(name, email, password) VALUES('${name}','${email}','${hashedPassword}')`
+    const query = `INSERT INTO users(name, email, password) VALUES('${name}','${email}','${hashedPassword}')`
 
     await sequelize.query(query,{type:QueryTypes.INSERT})
 
@@ -108,7 +108,7 @@ async function loginPost(req, res) {
     const { email, password } = req.body;
   
 
-    const query = `SELECT * FROM tb_users WHERE email='${email}'`;
+    const query = `SELECT * FROM users WHERE email='${email}'`;
     const user = await sequelize.query(query, { type: QueryTypes.SELECT });
   
     if (!user.length) {
@@ -172,7 +172,7 @@ async function loginPost(req, res) {
 async function projectDelete(req, res) {
     const { id } = req.params;
   
-    const query = `DELETE FROM tb_projects WHERE id=${id}`;
+    const query = `DELETE FROM projects WHERE id=${id}`;
     await sequelize.query(query, { type: QueryTypes.DELETE });
   
     res.redirect("/");
@@ -181,7 +181,7 @@ async function projectDelete(req, res) {
 async function projectDetail(req, res) {
     const { id } = req.params;
 
-    const query = `SELECT * FROM tb_projects WHERE id = :id`;
+    const query = `SELECT * FROM projects WHERE id = :id`;
     const project = await sequelize.query(query, { 
         type: QueryTypes.SELECT, 
         replacements: { id } 
@@ -198,7 +198,7 @@ async function projectDetail(req, res) {
 async function updateProject(req, res) {
     const { id } = req.params;
     
-    const query = `SELECT * FROM tb_projects WHERE id=${id}`;
+    const query = `SELECT * FROM projects WHERE id=${id}`;
     const project = await sequelize.query(query, { type: QueryTypes.SELECT });
 
     if (project.length > 0) {
