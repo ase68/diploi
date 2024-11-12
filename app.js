@@ -45,11 +45,11 @@ app.post("/login", loginPost)
 app.post("/logout", logoutPost);
 app.get("/register", register)
 app.post("/register", registerPost)
-app.post("/project",upload.single("image"), projectPost);
+// app.post("/project",upload.single("image"), projectPost);
 app.post("/delete-project/:id", projectDelete);
 app.get("/project-detail/:id", projectDetail);
 app.get("/update-project/:id", updateProject);
-app.post("/update-project/:id",upload.single("image"), updateProjectPost);
+// app.post("/update-project/:id",upload.single("image"), updateProjectPost);
 
 
 // Mengambil data proyek untuk halaman home
