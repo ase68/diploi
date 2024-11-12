@@ -45,11 +45,11 @@ app.post("/login", loginPost)
 app.post("/logout", logoutPost);
 app.get("/register", register)
 app.post("/register", registerPost)
-// app.post("/project",upload.single("image"), projectPost);
+app.post("/project",upload.single("image"), projectPost);
 app.post("/delete-project/:id", projectDelete);
 app.get("/project-detail/:id", projectDetail);
 app.get("/update-project/:id", updateProject);
-// app.post("/update-project/:id",upload.single("image"), updateProjectPost);
+app.post("/update-project/:id",upload.single("image"), updateProjectPost);
 
 
 // Mengambil data proyek untuk halaman home
@@ -139,34 +139,34 @@ async function loginPost(req, res) {
   }
   
 
-// async function projectPost(req, res) { 
-//     // Cek apakah user sudah login
-//     if (!req.session.user) {
-//         req.flash("error", "Anda harus login terlebih dahulu!");
-//         return res.redirect("/login");
-//     }
+async function projectPost(req, res) { 
+    // Cek apakah user sudah login
+    if (!req.session.user) {
+        req.flash("error", "Anda harus login terlebih dahulu!");
+        return res.redirect("/login");
+    }
 
-//     const { title, desc, technologies, start_date, end_date } = req.body;
-//     const techArray = Array.isArray(technologies)
-//         ? technologies
-//         : typeof technologies === "string"
-//         ? technologies.split(',').map(tech => tech.trim())
-//         : [];
+    const { title, desc, technologies, start_date, end_date } = req.body;
+    const techArray = Array.isArray(technologies)
+        ? technologies
+        : typeof technologies === "string"
+        ? technologies.split(',').map(tech => tech.trim())
+        : [];
     
-//     const { id } = req.session.user; 
-//     const imagePath = req.file.path;
-//     const formattedTechnologies = `{${techArray.join(',')}}`;
+    const { id } = req.session.user; 
+    const imagePath = req.file.path;
+    const formattedTechnologies = `{${techArray.join(',')}}`;
 
-//     const query = `
-//         INSERT INTO tb_projects (name, description, image, technologies, start_date, end_date, author_id) 
-//         VALUES ('${title}', '${desc}', '${imagePath}', '${formattedTechnologies}', '${start_date}', '${end_date}', '${id}')
-//     `;
-//     await sequelize.query(query, {
-//         type: QueryTypes.INSERT
-//     });
+    const query = `
+        INSERT INTO projects (name, description, image, technologies, start_date, end_date, author_id) 
+        VALUES ('${title}', '${desc}', '${imagePath}', '${formattedTechnologies}', '${start_date}', '${end_date}', '${id}')
+    `;
+    await sequelize.query(query, {
+        type: QueryTypes.INSERT
+    });
     
-//     res.redirect("/");
-// }
+    res.redirect("/");
+}
 
 
 async function projectDelete(req, res) {
@@ -209,38 +209,38 @@ async function updateProject(req, res) {
     }
 }
 
-// async function updateProjectPost(req, res) {
-//     const { id } = req.params;
-//     const { title, desc, technologies, start_date, end_date } = req.body;
+async function updateProjectPost(req, res) {
+    const { id } = req.params;
+    const { title, desc, technologies, start_date, end_date } = req.body;
     
-//     // Format technologies ke dalam format array PostgreSQL
-//     const techArray = Array.isArray(technologies)
-//         ? technologies
-//         : typeof technologies === "string"
-//         ? technologies.split(',').map(tech => tech.trim())
-//         : [];
-//     const formattedTechnologies = `{${techArray.join(',')}}`;
+    // Format technologies ke dalam format array PostgreSQL
+    const techArray = Array.isArray(technologies)
+        ? technologies
+        : typeof technologies === "string"
+        ? technologies.split(',').map(tech => tech.trim())
+        : [];
+    const formattedTechnologies = `{${techArray.join(',')}}`;
 
   
-//     const imagePath = req.file ? req.file.path : null;
+    const imagePath = req.file ? req.file.path : null;
 
 
-//     const query = `
-//         UPDATE tb_projects
-//         SET name = '${title}', 
-//             description = '${desc}', 
-//             ${imagePath ? `image = '${imagePath}',` : ""}
-//             technologies = '${formattedTechnologies}', 
-//             start_date = '${start_date}', 
-//             end_date = '${end_date}'
-//         WHERE id = '${id}'
-//     `;
+    const query = `
+        UPDATE projects
+        SET name = '${title}', 
+            description = '${desc}', 
+            ${imagePath ? `image = '${imagePath}',` : ""}
+            technologies = '${formattedTechnologies}', 
+            start_date = '${start_date}', 
+            end_date = '${end_date}'
+        WHERE id = '${id}'
+    `;
 
-//     await sequelize.query(query, {
-//         type: QueryTypes.UPDATE
-//     });
-//     res.redirect("/");
-// }
+    await sequelize.query(query, {
+        type: QueryTypes.UPDATE
+    });
+    res.redirect("/");
+}
 
 
 app.listen(port, () => {
