@@ -29,26 +29,11 @@ app.use(
       resave: false,
       saveUninitialized: true,
       cookie: {
-        secure: environment === 'production',
-        maxAge: 1000 * 60 * 60 * 24, // 1 hari
+        secure: false,
+        maxAge: 1000 * 60 * 60 * 24
       },
     })
   );
-
-  
-app.use(flash());
-sequelize.authenticate()
-  .then(() => {
-    console.log('Connection to the database has been established successfully.');
-  })
-  .catch(err => {
-    console.error('Unable to connect to the database:', err);
-  });
-app.use((req, res, next) => {
-    res.locals.user = req.session.user || null;
-    res.locals.messages = req.flash(); 
-    next();
-});
 
 // Rute yang digunakan
 app.get("/", home);
@@ -73,13 +58,6 @@ async function home(req, res) {
 
     const query = `SELECT tb_projects.*, tb_users.name AS author FROM tb_projects LEFT JOIN tb_users ON tb_projects.author_id = tb_users.id`;
     let projects = await sequelize.query(query, { type: QueryTypes.SELECT });
-
-    projects = projects.map((project) => ({
-        ...project,
-        technologies: project.technologies,
-    }));
-
-
 
     res.render("index", { projects, user,  messages: res.locals.messages });
 }
@@ -161,34 +139,34 @@ async function loginPost(req, res) {
   }
   
 
-async function projectPost(req, res) { 
-    // Cek apakah user sudah login
-    if (!req.session.user) {
-        req.flash("error", "Anda harus login terlebih dahulu!");
-        return res.redirect("/login");
-    }
+// async function projectPost(req, res) { 
+//     // Cek apakah user sudah login
+//     if (!req.session.user) {
+//         req.flash("error", "Anda harus login terlebih dahulu!");
+//         return res.redirect("/login");
+//     }
 
-    const { title, desc, technologies, start_date, end_date } = req.body;
-    const techArray = Array.isArray(technologies)
-        ? technologies
-        : typeof technologies === "string"
-        ? technologies.split(',').map(tech => tech.trim())
-        : [];
+//     const { title, desc, technologies, start_date, end_date } = req.body;
+//     const techArray = Array.isArray(technologies)
+//         ? technologies
+//         : typeof technologies === "string"
+//         ? technologies.split(',').map(tech => tech.trim())
+//         : [];
     
-    const { id } = req.session.user; 
-    const imagePath = req.file.path;
-    const formattedTechnologies = `{${techArray.join(',')}}`;
+//     const { id } = req.session.user; 
+//     const imagePath = req.file.path;
+//     const formattedTechnologies = `{${techArray.join(',')}}`;
 
-    const query = `
-        INSERT INTO tb_projects (name, description, image, technologies, start_date, end_date, author_id) 
-        VALUES ('${title}', '${desc}', '${imagePath}', '${formattedTechnologies}', '${start_date}', '${end_date}', '${id}')
-    `;
-    await sequelize.query(query, {
-        type: QueryTypes.INSERT
-    });
+//     const query = `
+//         INSERT INTO tb_projects (name, description, image, technologies, start_date, end_date, author_id) 
+//         VALUES ('${title}', '${desc}', '${imagePath}', '${formattedTechnologies}', '${start_date}', '${end_date}', '${id}')
+//     `;
+//     await sequelize.query(query, {
+//         type: QueryTypes.INSERT
+//     });
     
-    res.redirect("/");
-}
+//     res.redirect("/");
+// }
 
 
 async function projectDelete(req, res) {
@@ -231,38 +209,38 @@ async function updateProject(req, res) {
     }
 }
 
-async function updateProjectPost(req, res) {
-    const { id } = req.params;
-    const { title, desc, technologies, start_date, end_date } = req.body;
+// async function updateProjectPost(req, res) {
+//     const { id } = req.params;
+//     const { title, desc, technologies, start_date, end_date } = req.body;
     
-    // Format technologies ke dalam format array PostgreSQL
-    const techArray = Array.isArray(technologies)
-        ? technologies
-        : typeof technologies === "string"
-        ? technologies.split(',').map(tech => tech.trim())
-        : [];
-    const formattedTechnologies = `{${techArray.join(',')}}`;
+//     // Format technologies ke dalam format array PostgreSQL
+//     const techArray = Array.isArray(technologies)
+//         ? technologies
+//         : typeof technologies === "string"
+//         ? technologies.split(',').map(tech => tech.trim())
+//         : [];
+//     const formattedTechnologies = `{${techArray.join(',')}}`;
 
   
-    const imagePath = req.file ? req.file.path : null;
+//     const imagePath = req.file ? req.file.path : null;
 
 
-    const query = `
-        UPDATE tb_projects
-        SET name = '${title}', 
-            description = '${desc}', 
-            ${imagePath ? `image = '${imagePath}',` : ""}
-            technologies = '${formattedTechnologies}', 
-            start_date = '${start_date}', 
-            end_date = '${end_date}'
-        WHERE id = '${id}'
-    `;
+//     const query = `
+//         UPDATE tb_projects
+//         SET name = '${title}', 
+//             description = '${desc}', 
+//             ${imagePath ? `image = '${imagePath}',` : ""}
+//             technologies = '${formattedTechnologies}', 
+//             start_date = '${start_date}', 
+//             end_date = '${end_date}'
+//         WHERE id = '${id}'
+//     `;
 
-    await sequelize.query(query, {
-        type: QueryTypes.UPDATE
-    });
-    res.redirect("/");
-}
+//     await sequelize.query(query, {
+//         type: QueryTypes.UPDATE
+//     });
+//     res.redirect("/");
+// }
 
 
 app.listen(port, () => {
